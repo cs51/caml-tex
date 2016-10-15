@@ -1,0 +1,14 @@
+\documentclass[12pt]{article}
+
+\begin{document}
+
+\begin{caml_eval}
+let x = 5;;
+x;;
+\end{caml_eval}
+
+\begin{caml_example}
+let x = 6969;;
+\end{caml_example}
+
+\end{document}
