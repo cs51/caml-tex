@@ -34,7 +34,7 @@ START_ECHO_EXAMPLE = r'\\begin{caml_example}\s*'
 
 START_NOECHO_EXAMPLE = r'\\begin{caml_example*}\s*'
 
-START_EVAL = r'\\begin{caml_eval*}\s*'
+START_EVAL = r'\\begin{caml_eval}\s*'
 
 def read_ml_block(filepointer, ocaml_session, echo_eval=True):
 	total_eval = ''
