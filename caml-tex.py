@@ -108,7 +108,7 @@ def read_ml_block(filepointer, ocaml_session, echo_eval=True):
 
 import pexpect
 
-def convert_to_ml(filename, outfilename):
+def convert_to_tex(filename, outfilename):
 
 	# start up and wait for the shell to be ready 
 	ocaml_session = pexpect.spawn('ocaml')
@@ -135,7 +135,7 @@ def convert_to_ml(filename, outfilename):
 		if not l:
 			infile.close()
 			outfile.close()
-			exit(0)
+			return
 
 		if re.search(START_ECHO_EXAMPLE, l):
 			evaled = read_ml_block(infile, ocaml_session)
@@ -164,14 +164,19 @@ def convert_to_ml(filename, outfilename):
 if __name__ == '__main__':
 	(options, args) = read_options()
 
+	print args 
+
 	for arg in args:
-		
+		print arg
+
 		if options.outfile is "":
-			options.outfile = arg + '.tex'	
+			print 'h'
+			out = arg + '.tex'
+		else:
+			out = options.outfile	
 
-		convert_to_ml(arg, options.outfile)
+		convert_to_tex(arg, out)
 
-		break
 
 
 
