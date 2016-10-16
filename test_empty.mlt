@@ -1,0 +1,10 @@
+\documentclass[12pt]{article}
+
+\begin{document}
+
+
+\begin{caml_example}
+let () = ();;
+\end{caml_example}
+
+\end{document}

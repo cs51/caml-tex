@@ -1,5 +1,13 @@
 #! /usr/bin/env python
 
+"""
+A python version of caml-tex.
+
+Known problems: 
+	- Trailing comments are not handled properly 
+		(anything after ;; is treated as output)
+"""
+
 import re
 from optparse import OptionParser
 import os
@@ -57,17 +65,22 @@ def read_ml_block(filepointer, ocaml_session, echo_eval=True):
 		elif ";;" in l:
 			ml = ml + l
 
+			# send the ML to the ocaml shell
 			ocaml_session.sendline(ml)
 
+			# wait for the command to finish evaluating
 			ocaml_session.expect('#')
 
-			# get back what we just read and evaluated
+			# get back what we just sent and evaluated
 			evaled = ocaml_session.before
 
 			# getting a bit hacky here...
+			# find where to split input and output
 			indx =  evaled.find(';;')
 			
+			# input is before the ;;
 			inputted = evaled[:indx + 2]
+			# output is after the 
 			outputted = evaled[indx + 2:]
 
 			clean_input = map(process_inline,

@@ -1,0 +1,14 @@
+\documentclass[12pt]{article}
+
+\begin{document}
+
+
+\begin{caml_example}
+let () = () (*hello my name is a comment*);;
+\end{caml_example}
+
+\begin{caml_example}
+let () = () ;; (*hello my name is a comment*)
+\end{caml_example}
+
+\end{document}
