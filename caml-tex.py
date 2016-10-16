@@ -6,6 +6,7 @@ A python version of caml-tex.
 Known problems: 
 	- Trailing comments are not handled properly 
 		(anything after ;; is treated as output)
+	- -n, -w arguments do nothing (need to understand what they did previously)
 """
 
 import re
