@@ -73,7 +73,7 @@ class BadMLException(Exception):
     def __repr__(self):
         return "BadMLException: {}".format(self.message)
 
-def read_ml_block(filepointer, ocaml_session, echo_eval=True):
+def read_ml_block(filepointer, ocaml_session, eval_ml=True, echo_eval=True):
     """
     Assuming that an OCaml block has been detected,
     reads the file until it sees that a block,
@@ -101,6 +101,15 @@ def read_ml_block(filepointer, ocaml_session, echo_eval=True):
         # if an ocaml expression ends here
         elif ";;" in line:
             ml_accum = ml_accum + line
+
+            # if we're just parsing ML, continue
+            if not eval_ml:
+                clean_input = map(process_inline,
+                                  [s for s in
+                                   [s.strip() for s in ml_accum.split('\r\n')]
+                                   if len(s) > 0])
+                total_eval += clean_input
+                ml_accum = ""
 
             # send the ML to the ocaml shell
             ocaml_session.sendline(ml_accum)
@@ -204,6 +213,9 @@ def convert_to_tex(filename, outfilename):
         # but don't echo the output
         elif re.search(START_EVAL, line):
             read_ml_block(infile, ocaml_session)
+
+        elif re.search(START_LISTING, line):
+            listing = read_ml_block()
 
         # otherwise, this line is just .tex and should be echoed
         else:
