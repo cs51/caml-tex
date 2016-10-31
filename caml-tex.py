@@ -60,6 +60,10 @@ START_EVAL = r'\s*\\begin{caml_eval}\s*'
 
 START_LISTING = r'\s*\\begin{caml_listing}\s*'
 
+
+class BadMLException(Exception):
+    pass
+
 def read_ml_block(filepointer, ocaml_session, echo_eval=True):
     """
     Assuming that an OCaml block has been detected,
@@ -100,13 +104,18 @@ def read_ml_block(filepointer, ocaml_session, echo_eval=True):
 
             # getting a bit hacky here...
             # find where to split input and output
-            indx = evaled.find(';;')
+            semi_indx = evaled.find(';;')
+
+            if semi_indx == -1:
+                raise BadMLException
+
+            newline_indx = evaled[semi_indx+2:].find('\n')
 
             # input is before the ;;
-            inputted = evaled[:indx + 2]
+            inputted = evaled[:(semi_indx + 2 + newline_indx)]
 
             # output is after the ;;
-            outputted = evaled[indx + 2:]
+            outputted = evaled[(semi_indx + 2 + newline_indx):]
 
             clean_input = map(process_inline,
                               [s for s in
