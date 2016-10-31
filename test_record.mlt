@@ -1,0 +1,14 @@
+\documentclass[12pt]{article}
+
+\usepackage{caml}
+
+\begin{document}
+
+\begin{caml_example}
+
+type x = {y: int; z: float} ;;
+
+\end{caml_example}
+
+
+\end{document}

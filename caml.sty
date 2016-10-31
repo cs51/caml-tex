@@ -1,0 +1,169 @@
+%%
+%% This is file `caml.sty',
+%% generated with the docstrip utility.
+%%
+%% The original source files were:
+%%
+%% caml.dtx  (with options: `package')
+%%   File for use with `caml-tex.'
+%%
+%% File `caml.dtx'.
+%% Copyright (C) 1995 Jens Kl\"ocker.
+%% All rights reserved.
+%%
+%% \CharacterTable
+%%  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
+%%   Lower-case    \a\b\c\d\e\f\g\h\i\j\k\l\m\n\o\p\q\r\s\t\u\v\w\x\y\z
+%%   Digits        \0\1\2\3\4\5\6\7\8\9
+%%   Exclamation   \!     Double quote  \"     Hash (number) \#
+%%   Dollar        \$     Percent       \%     Ampersand     \&
+%%   Acute accent  \'     Left paren    \(     Right paren   \)
+%%   Asterisk      \*     Plus          \+     Comma         \,
+%%   Minus         \-     Point         \.     Solidus       \/
+%%   Colon         \:     Semicolon     \;     Less than     \<
+%%   Equals        \=     Greater than  \>     Question mark \?
+%%   Commercial at \@     Left bracket  \[     Backslash     \\
+%%   Right bracket \]     Circumflex    \^     Underscore    \_
+%%   Grave accent  \`     Left brace    \{     Vertical bar  \|
+%%   Right brace   \}     Tilde         \~}
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{caml}
+    [1996/01/08 v1.1 package for use with caml-tex (JK)]
+\RequirePackage{alltt}
+\newif\ifcaml@slanted\caml@slantedfalse
+\newif\iffollow@in\follow@intrue
+\newif\iffollow@out\follow@outtrue
+\newif\iffollowout@prompt\followout@prompttrue
+\newif\iffollowin@prompt\followin@prompttrue
+\newif\ifcaml@boxed\caml@boxedfalse
+\DeclareOption{slanted}{\caml@slantedtrue}
+\ProcessOptions
+\newcommand{\followinprompt}{\follow@intrue}
+\newcommand{\nofollowinprompt}{\follow@infalse}
+\newcommand{\followoutprompt}{\follow@outtrue}
+\newcommand{\nofollowoutprompt}{\follow@outfalse}
+\newcommand{\boxedcaml}{\caml@boxedtrue}
+\newcommand{\noboxedcaml}{\caml@boxedfalse}
+\newcommand{\camlsize}{\normalsize}
+\newcommand{\camlinputprompt}{\#\thinspace}
+\newcommand{\camloutputprompt}{}
+\newlength{\abovecamlskip}
+\setlength{\abovecamlskip}{\bigskipamount}
+\newlength{\belowcamlskip}
+\setlength{\belowcamlskip}{\bigskipamount}
+\newlength{\camlblanklineskip}
+\setlength{\camlblanklineskip}{\medskipamount}
+\newlength{\camlboxindent}
+\setlength{\camlboxindent}{0pt}
+% SMS: added \camlindent to control overall indentation of unboxed listings
+\newlength{\camlindent}
+\setlength{\camlindent}{0pt}
+\newlength{\camlboxsep}
+\setlength{\camlboxsep}{0pt}
+\newcommand{\caml@blankline}{%
+  \vspace{\camlblanklineskip}%
+  \followin@prompttrue\followout@prompttrue}
+\newcommand{\caml@inputline}[1]{%
+  \camlsize\upshape%
+  \iffollowin@prompt%
+    \camlinputprompt%
+  \else%
+    \setbox0=\hbox{\camlinputprompt}\hskip\wd0%
+  \fi%
+  \iffollow@in%
+    \relax%
+  \else%
+    \followin@promptfalse%
+  \fi #1}
+
+\newcommand{\caml@outputline}[1]{%
+  \camlsize%
+  \ifcaml@slanted%
+    \slshape%
+  \fi%
+  \iffollowout@prompt%
+    \camloutputprompt%
+  \else%
+    \setbox0=\hbox{\camloutputprompt}\hskip\wd0%
+  \fi%
+  \iffollow@out%
+    \relax%
+  \else%
+    \followout@promptfalse%
+  \fi #1}
+\newcommand{\@caml@inputline}[1]{%
+  \camlsize\upshape%
+  \hskip\camlboxsep%
+  \iffollowin@prompt%
+    \camlinputprompt%
+  \else%
+  \setbox0=\hbox{\camlinputprompt}\hskip\wd0%
+  \fi%
+  \iffollow@in%
+    \relax%
+  \else%
+    \followin@promptfalse%
+  \fi%
+  \setbox0=\hbox{\hskip\camlboxsep\camlinputprompt%
+  #1\hskip\camlboxsep}%
+  \hsize=\wd0
+  #1}
+
+\newcommand{\@caml@outputline}[1]{%
+  \camlsize%
+  \ifcaml@slanted%
+    \slshape%
+  \fi%
+  \hskip\camlboxsep%
+  \iffollowout@prompt%
+    \camloutputprompt%
+  \else%
+    \setbox0=\hbox{\camloutputprompt}\hskip\wd0%
+  \fi%
+  \iffollow@out%
+    \relax%
+  \else%
+    \followout@promptfalse%
+  \fi%
+  \setbox0=\hbox{\hskip\camlboxsep\camloutputprompt%
+  #1%
+  \hskip\camlboxsep}%
+  \hsize=\wd0%
+  \mbox{}#1}
+\newsavebox{\caml@box}
+\newcommand{\camlbslash}{\char'134}
+\newenvironment{caml}{%
+  \setlength{\partopsep}{0pt}%
+  \setlength{\topsep}{0pt}%
+  \setlength{\parindent}{0pt}%
+% SMS changed this to a list rather than trivlist to allow modifying
+% left margin
+  \begin{list}{\leftmargin\parindent}\item%
+  \vspace{\abovecamlskip}%
+  \let\;\caml@blankline%
+% SMS October 15, 2015
+% Modified the next two lines to use the unboxed versions. As far as I
+% can tell they were never being called, even though I'm using the
+% unboxed variant.
+%  \let\?\@caml@inputline%
+%  \let\:\@caml@outputline%
+  \let\?\caml@inputline%
+  \let\:\caml@outputline%
+  \ifcaml@boxed%
+    \begin{lrbox}{\caml@box}%
+    \begin{minipage}{\linewidth}%
+    \vspace*{\camlboxsep}%
+  \fi%
+  \begin{alltt}}
+{\end{alltt}%
+  \ifcaml@boxed%
+    \vspace*{\camlboxsep}%
+    \end{minipage}\end{lrbox}%
+    \hskip\camlboxindent%
+    \fbox{\usebox{\caml@box}}%
+  \fi%
+  \vspace{\belowcamlskip}%
+  \end{list}}
+\endinput
+%%
+%% End of file `caml.sty'.
