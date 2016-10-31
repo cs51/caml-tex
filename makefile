@@ -18,3 +18,9 @@ test:
 	pdflatex -shell-escape test.mlt.tex
 	pdflatex -shell-escape test.mlt.tex
 	open test.mlt.pdf
+
+bad:
+	./caml-tex.py test_bad.mlt
+	pdflatex -shell-escape test_bad.mlt.tex
+	pdflatex -shell-escape test_bad.mlt.tex
+	open test_bad.mlt.pdf

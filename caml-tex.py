@@ -62,7 +62,16 @@ START_LISTING = r'\s*\\begin{caml_listing}\s*'
 
 
 class BadMLException(Exception):
-    pass
+    """
+    Class to represent Exceptions when
+    parsing ML from the .mlt file.
+    """
+    def __init__(self, message):
+        self.message = message
+        super(BadMLException, self).__init__()
+
+    def __repr__(self):
+        return "BadMLException: {}".format(self.message)
 
 def read_ml_block(filepointer, ocaml_session, echo_eval=True):
     """
@@ -107,9 +116,12 @@ def read_ml_block(filepointer, ocaml_session, echo_eval=True):
             semi_indx = evaled.find(';;')
 
             if semi_indx == -1:
-                raise BadMLException
+                raise BadMLException("Double Semi-Colon not found.")
 
             newline_indx = evaled[semi_indx+2:].find('\n')
+
+            if newline_indx == -1:
+                raise BadMLException("Newline ending input not found.")
 
             # input is before the ;;
             inputted = evaled[:(semi_indx + 2 + newline_indx)]
