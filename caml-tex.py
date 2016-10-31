@@ -29,6 +29,7 @@ def read_options():
 
     return parser.parse_args()
 
+
 def escape_latex_special(line):
     """Replace OCaml special characters with LaTeX specials"""
     line = line.replace('\\', r'\\camlbslash')
@@ -72,6 +73,7 @@ class BadMLException(Exception):
 
     def __repr__(self):
         return "BadMLException: {}".format(self.message)
+
 
 def read_ml_block(filepointer, ocaml_session, eval_ml=True, echo_eval=True):
     """

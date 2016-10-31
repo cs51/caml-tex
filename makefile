@@ -1,6 +1,8 @@
 clean:
 	rm *.aux *.log *.tex *.pdf
 
+all: record empty test bad
+
 record:
 	./caml-tex.py test_record.mlt
 	pdflatex -shell-escape test_record.mlt.tex
