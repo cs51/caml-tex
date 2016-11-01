@@ -25,7 +25,7 @@ class OCamlSession(object):
         self.ocaml.sendline(ml_block)
         self.ocaml.expect('#')
         statement = self.ocaml.before
-        
+
         return statement.strip()
 
     def reset(self):
@@ -33,8 +33,8 @@ class OCamlSession(object):
         Return the session to an clean state by
         resetting the underlying OCaml process.
         """
-        self.ocaml_interactive = pexpect.spawn('ocaml')
-        self.ocaml_interactive.expect('#')
+        self.ocaml = pexpect.spawn('ocaml')
+        self.ocaml.expect('#')
 
         return True
 
