@@ -22,9 +22,9 @@ class CamlTexFileWriter(object):
         """
         Make it so that the OCaml looks
         pretty, by outputting the appropriate
-        code formatting styles. 
+        code formatting styles.
         """
-        self.fpointer.write('\n\usepackage{fancyvrb,color}\n')
+        self.fpointer.write('\n\\usepackage{fancyvrb,color}\n')
         self.fpointer.write(LF.get_style_defs())
 
     def write_tex(self, line):
