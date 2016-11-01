@@ -7,6 +7,9 @@ from pygments import highlight
 from pygments.formatters import LatexFormatter
 from pygments.lexers.functional import OcamlLexer
 
+LF = LatexFormatter()
+OL = OcamlLexer()
+
 class CamlTexFileWriter(object):
     """
     Wrapper class to manage listings in OCaml.
@@ -14,6 +17,14 @@ class CamlTexFileWriter(object):
     def __init__(self, filepath):
         self.fname = filepath
         self.fpointer = open(filepath, 'w')
+
+    def write_styles(self):
+        """
+        Make it so that the OCaml looks
+        pretty, by outputting the appropriate
+        code formatting styles. 
+        """
+        self.fpointer.write(LF.get_style_defs())
 
     def write_tex(self, line):
         """
@@ -23,8 +34,12 @@ class CamlTexFileWriter(object):
         return True
 
     def write_ocaml(self, ml_block):
-        print "WRITING OCAML", ml_block
-        pass
+        """
+        Write stylized OCaml to the output file,
+        styling with pygments at the same time.
+        """
+        self.fpointer.write(highlight(ml_block, OL, LF))
+        return True
 
     def close(self):
         """Close the file writer"""

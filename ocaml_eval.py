@@ -24,7 +24,7 @@ class OCamlSession(object):
         """
         self.ocaml.sendline(ml_block)
         self.ocaml.expect('#')
-        statement = self.ocaml.before.strip().split('\r\n')
+        statement = self.ocaml.before
 
         return statement
 
