@@ -1,7 +1,10 @@
 clean:
-	rm *.aux *.log *.tex *.pdf
+	rm *.aux *.log *.tex *.pdf *.pyc
 
 all: record empty test bad
+
+mlt:
+	./caml-tex.py test.mlt
 
 record:
 	./caml-tex.py test_record.mlt

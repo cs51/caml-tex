@@ -1,17 +1,27 @@
 \documentclass[12pt]{article}
+\usepackage{fullpage}
 
-\usepackage{caml}
 \begin{document}
-
-\begin{caml_eval}
-let x = 5;;
-x;;
-\end{caml_eval}
+hello govna
 
 \begin{caml_example}
-let x = 1000 in 
-let y = x + 10 in
+let x = 5 in 
+let y = x + 1 in
 y;;
 \end{caml_example}
+
+\begin{caml_example*}
+let x = 6;;
+let x = 7;;
+let x = 8;; (*hello world and all who there be *)
+\end{caml_example*}
+
+\begin{caml_listing}
+let x = 10;;
+\end{caml_listing}
+
+\begin{caml_eval}
+let x = 20;;
+\end{caml_eval}
 
 \end{document}

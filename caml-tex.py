@@ -11,8 +11,8 @@ Known problems:
 
 import re
 from optparse import OptionParser
-import pexpect
 from ocaml_eval import OCamlSession
+from ocaml_writer import CamlTexFileWriter
 
 def read_options():
     """Parse options for the program. """
@@ -30,37 +30,14 @@ def read_options():
 
     return parser.parse_args()
 
+START_REGEX = r"\s*\\begin{caml_(example|example\*|eval)\s*}"
+END_REGEX = r"\\end{caml_(example|example\*|eval|listing)}\s*"
 
-def escape_latex_special(line):
-    """Replace OCaml special characters with LaTeX specials"""
-    line = line.replace('\\', r'\\camlbslash')
-    line = line.replace('{', r'\\{')
-    line = line.replace('}', r'\\}')
-    return line
+LISTING = r'\s*\\(begin|end){caml_listing}\s*'
 
-
-def process_inline(line):
-    """Wrap a line of input ML in the special OCaml characters."""
-    line = escape_latex_special(line)
-
-    joined = '\\?{' + line + '}\n'
-    return joined
-
-def process_outline(line):
-    """Wrap a line of evaluated ML in the special OCaml characters."""
-    line = escape_latex_special(line)
-
-    return '\\:{' + line + '}\n'
-
-END_REGEX = r"\\end{caml_(example|example\*|eval)}\s*"
-
-START_ECHO_EXAMPLE = r'\s*\\begin{caml_example}\s*'
-
-START_NOECHO_EXAMPLE = r'\s*\\begin{caml_example*}\s*'
-
-START_EVAL = r'\s*\\begin{caml_eval}\s*'
-
-START_LISTING = r'\s*\\begin{caml_listing}\s*'
+ECHO_EXAMPLE = r'\s*\\end{caml_example}\s*'
+NOECHO_EXAMPLE = r'\s*\\end{caml_example*}\s*'
+EVAL = r'\s*\\end{caml_eval}\s*'
 
 class BadMLException(Exception):
     """
@@ -79,7 +56,6 @@ class BadTexException(Exception):
     Class to represent exceptions related
     to parsing TeX from the .mlt file.
     """
-
     def __init__(self, message):
         self.message = message
         super(BadTexException, self).__init__()
@@ -87,11 +63,10 @@ class BadTexException(Exception):
     def __repr__(self):
         return "BadTexException: {}".format(self.message)
 
-
 def extract_ml_statements(filepointer):
     """
     Extract ML statements from the filepointer.
-    Assumed that an block starts here. 
+    Assumed that an block starts here.
     """
 
     statements = []
@@ -105,16 +80,13 @@ def extract_ml_statements(filepointer):
             raise BadTexException("Opened Caml Statement never closed.")
 
         elif re.search(END_REGEX, line):
-            break
+            return statements, line
 
         statement += line
 
         if ";;" in line:
             statements.append(statement)
             statement = ""
-
-    return statements
-
 
 def read_ml_block(filepointer, ocaml_session, eval_ml=True, echo_eval=True):
     """
@@ -214,17 +186,17 @@ def convert_to_tex(filename, outfilename):
     # start up and wait for the shell to be ready
     ocaml = OCamlSession()
 
+    try:
+        writer = CamlTexFileWriter(outfilename)
+    except IOError as excep:
+        print "Could not open output file: {}".format(excep)
+        exit(1)
+
     # get the source file and the output file
     try:
         infile = open(filename, 'r')
     except IOError as excep:
         print "Input file error: {}".format(excep)
-        exit(1)
-
-    try:
-        outfile = open(outfilename, 'w')
-    except IOError as excep:
-        print "Output file error: {}".format(excep)
         exit(1)
 
     while True:
@@ -234,34 +206,59 @@ def convert_to_tex(filename, outfilename):
         # if we've hit end of line, get out of here
         if not line:
             infile.close()
-            outfile.close()
+            writer.close()
             return
 
-        if re.search(START_ECHO_EXAMPLE, line):
-            evaled = read_ml_block(infile, ocaml_session)
+        # case for ocaml statements that interact with the shell
+        if re.search(START_REGEX, line):
+            statements, endline = extract_ml_statements(infile)
 
-            outfile.write('\\begin{caml}\n')
-            outfile.write(evaled)
-            outfile.write('\\end{caml}\n')
+            print line, endline
 
-        elif re.search(START_NOECHO_EXAMPLE, line):
-            evaled = read_ml_block(infile, ocaml_session, echo_eval=False)
+            example_start = bool(re.match(ECHO_EXAMPLE, line))
+            example_star_start = bool(re.match(NOECHO_EXAMPLE, line))
+            eval_start = bool(re.match(EVAL, line))
 
-            outfile.write('\\begin{caml}\n')
-            outfile.write(evaled)
-            outfile.write('\\end{caml}\n')
+            example_end = bool(re.match(ECHO_EXAMPLE, endline))
+            example_star_end = bool(re.match(NOECHO_EXAMPLE, endline))
+            eval_end = bool(re.match(EVAL, endline))
 
-        # add the evaled block through the session
-        # but don't echo the output
-        elif re.search(START_EVAL, line):
-            read_ml_block(infile, ocaml_session)
+            pairs = [(statement, ocaml.evaluate(statement)) for statement in statements]
 
-        elif re.search(START_LISTING, line):
-            listing = read_ml_block()
+            if example_start:
+                if not example_end:
+                    raise BadTexException("Imbalanced start and end for caml block.")
+                tex_statement = "\n".join([p for p in [s + '\n' + e for (s, e) in pairs]])
+
+            if example_star_start:
+                if not example_star_end:
+                    raise BadTexException("Imbalanced start and end for caml block.")
+                tex_statement = "\n".join([s for s, _ in pairs])
+
+            if eval_start:
+                if not eval_end:
+                    raise BadTexException("Imbalanced start and end for caml block.")
+                tex_statement = None
+
+            if tex_statement is not None:
+                writer.write_ocaml(tex_statement)
+            else:
+                continue
+
+        # case for ocaml listings, which do not interact with the shell
+        elif re.search(LISTING, line):
+
+            statements, endline = extract_ml_statements(infile)
+
+            if bool(re.search(LISTING, line)) != bool(re.search(LISTING, endline)):
+                raise BadTexException("Imbalanced start and end for caml listing block.")
+
+            tex_statement = "\n".join(statements)
+            writer.write_ocaml(tex_statement)
 
         # otherwise, this line is just .tex and should be echoed
         else:
-            outfile.write(line)
+            writer.write_tex(line)
 
 def run():
     """
@@ -273,7 +270,6 @@ def run():
         print arg
 
         if options.outfile is "":
-            print 'h'
             out = arg + '.tex'
         else:
             out = options.outfile

@@ -14,15 +14,19 @@ class OCamlSession(object):
     """
 
     def __init__(self):
-        self.ocaml_interactive = pexpect.spawn('ocaml')
-        self.ocaml_interactive.expect('#')
+        self.ocaml = pexpect.spawn('ocaml')
+        self.ocaml.expect('#')
 
     def evaluate(self, ml_block):
         """
         Given an ML block, return the result of evaluating the ML block
         in the toplevel.
         """
-        raise NotImplementedError("OCamlSession Evaluate")
+        self.ocaml.sendline(ml_block)
+        self.ocaml.expect('#')
+        statement = self.ocaml.before.strip().split('\r\n')
+
+        return statement
 
     def reset(self):
         """
