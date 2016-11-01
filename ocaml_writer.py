@@ -24,6 +24,7 @@ class CamlTexFileWriter(object):
         pretty, by outputting the appropriate
         code formatting styles. 
         """
+        self.fpointer.write('\n\usepackage{fancyvrb,color}\n')
         self.fpointer.write(LF.get_style_defs())
 
     def write_tex(self, line):

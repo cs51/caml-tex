@@ -1,8 +1,6 @@
 \documentclass[12pt]{article}
 
-\usepackage{caml}
 \begin{document}
-
 
 \begin{caml_example}
 let () = () (*hello my name is a comment*) 

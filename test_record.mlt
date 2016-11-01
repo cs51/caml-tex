@@ -1,7 +1,5 @@
 \documentclass[12pt]{article}
 
-\usepackage{caml}
-
 \begin{document}
 
 \begin{caml_example}

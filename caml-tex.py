@@ -13,6 +13,7 @@ import re
 from optparse import OptionParser
 from ocaml_eval import OCamlSession
 from ocaml_writer import CamlTexFileWriter
+import os
 
 def read_options():
     """Parse options for the program. """
@@ -85,15 +86,19 @@ def convert_to_tex(filename, outfilename):
     """ Convert the MLT file at the path filename
         to a .tex file.
     """
-    
+
     # start up and wait for the shell to be ready
     ocaml = OCamlSession()
 
+    # try to open the outfile as a relative path first
     try:
-        writer = CamlTexFileWriter(outfilename)
-    except IOError as excep:
-        print "Could not open output file: {}".format(excep)
-        exit(1)
+        writer = CamlTexFileWriter(os.getcwd() + '/' + outfilename)
+    except IOError:
+        try:
+            writer = CamlTexFileWriter(outfilename)
+        except IOError as excep:
+            print "Could not open output file: {}".format(excep)
+            exit(1)
 
     # get the source file and the output file
     try:
