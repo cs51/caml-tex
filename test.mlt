@@ -2,9 +2,12 @@
 \usepackage{fullpage}
 \usepackage{fancyvrb,color}
 
-
 \begin{document}
 hello govna
+
+\begin{caml_example}
+let () = ();;
+\end{caml_example}
 
 \begin{caml_example}
 let x = 5 in 

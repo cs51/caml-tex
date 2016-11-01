@@ -24,13 +24,11 @@ def read_options():
 
     return parser.parse_args()
 
+# Regular Expressions
 DOC_START = r"\s*\\begin{document}\s*"
-
 START_REGEX = r"\s*\\begin{caml_(example|example\*|eval)\s*}"
 END_REGEX = r"\\end{caml_(example|example\*|eval|listing)}\s*"
-
 LISTING = r'\s*\\(begin|end){caml_listing}\s*'
-
 ECHO_IN = r'\s*\\end{caml_example\*?}\s*'
 ECHO_OUT = r'\s*\\end{caml_example}\s*'
 
@@ -87,7 +85,7 @@ def convert_to_tex(filename, outfilename):
     """ Convert the MLT file at the path filename
         to a .tex file.
     """
-
+    
     # start up and wait for the shell to be ready
     ocaml = OCamlSession()
 
