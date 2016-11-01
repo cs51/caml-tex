@@ -1,9 +1,16 @@
+"""
+Module containing wrapper class for an
+OCamlSession, built on pexpect.
+"""
 
-class OCamlSession():
+
+import pexpect
+
+class OCamlSession(object):
     """
     Wrapper around the pexpect class to run an OCaml session.
 
-    Might make it easier to this to be a generalized tool! 
+    Might make it easier to this to be a generalized tool!
     """
 
     def __init__(self):
@@ -11,13 +18,21 @@ class OCamlSession():
         self.ocaml_interactive.expect('#')
 
     def evaluate(self, ml_block):
-        pass
+        """
+        Given an ML block, return the result of evaluating the ML block
+        in the toplevel.
+        """
+        raise NotImplementedError("OCamlSession Evaluate")
 
-    def add_to_session(self, ml_block):
-        pass
-
-    def reset(self)
+    def reset(self):
+        """
+        Return the session to an clean state by
+        resetting the underlying OCaml process.
+        """
         self.ocaml_interactive = pexpect.spawn('ocaml')
         self.ocaml_interactive.expect('#')
 
         return True
+
+    def __repr__(self):
+        return "<OCaml Session>"

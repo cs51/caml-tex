@@ -12,6 +12,7 @@ Known problems:
 import re
 from optparse import OptionParser
 import pexpect
+from ocaml_eval import OCamlSession
 
 def read_options():
     """Parse options for the program. """
@@ -61,11 +62,10 @@ START_EVAL = r'\s*\\begin{caml_eval}\s*'
 
 START_LISTING = r'\s*\\begin{caml_listing}\s*'
 
-
 class BadMLException(Exception):
     """
-    Class to represent Exceptions when
-    parsing ML from the .mlt file.
+    Class to represent exceptions related
+    to parsing ML from the .mlt file.
     """
     def __init__(self, message):
         self.message = message
@@ -73,6 +73,47 @@ class BadMLException(Exception):
 
     def __repr__(self):
         return "BadMLException: {}".format(self.message)
+
+class BadTexException(Exception):
+    """
+    Class to represent exceptions related
+    to parsing TeX from the .mlt file.
+    """
+
+    def __init__(self, message):
+        self.message = message
+        super(BadTexException, self).__init__()
+
+    def __repr__(self):
+        return "BadTexException: {}".format(self.message)
+
+
+def extract_ml_statements(filepointer):
+    """
+    Extract ML statements from the filepointer.
+    Assumed that an block starts here. 
+    """
+
+    statements = []
+
+    statement = ""
+
+    while True:
+        line = filepointer.readline()
+
+        if line is None:
+            raise BadTexException("Opened Caml Statement never closed.")
+
+        elif re.search(END_REGEX, line):
+            break
+
+        statement += line
+
+        if ";;" in line:
+            statements.append(statement)
+            statement = ""
+
+    return statements
 
 
 def read_ml_block(filepointer, ocaml_session, eval_ml=True, echo_eval=True):
@@ -171,8 +212,7 @@ def convert_to_tex(filename, outfilename):
     """
 
     # start up and wait for the shell to be ready
-    ocaml_session = pexpect.spawn('ocaml')
-    ocaml_session.expect("#")
+    ocaml = OCamlSession()
 
     # get the source file and the output file
     try:
