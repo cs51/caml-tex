@@ -1,31 +1,30 @@
 clean:
 	rm *.aux *.log *.tex *.pdf *.pyc
+	rm testfiles/*.tex testfiles/*.log, testfiles/*.aux
 
 all: record empty test bad
 
 mlt:
-	./caml-tex.py test.mlt
+	./caml-tex testfiles/test.mlt -o testfiles/test.mlt.tex
 
 record:
-	./caml-tex.py test_record.mlt
-	pdflatex -shell-escape test_record.mlt.tex
-	pdflatex -shell-escape test_record.mlt.tex
-	open test_record.mlt.pdf
+	./caml-tex testfiles/test_record.mlt -o testfiles/test_record.mlt.tex
+	pdflatex -shell-escape -output-directory=testfiles testfiles/test_record.mlt.tex 
 
 empty:
-	./caml-tex.py test_empty.mlt
-	pdflatex -shell-escape test_empty.mlt.tex
-	pdflatex -shell-escape test_empty.mlt.tex
-	open test_empty.mlt.pdf
+	./caml-tex testfiles/test_empty.mlt -o testfiles/test_empty.mlt.tex
+	pdflatex -shell-escape -output-directory=testfiles testfiles/test_empty.mlt.tex 
+	pdflatex -shell-escape -output-directory=testfiles testfiles/test_empty.mlt.tex 
+	open testfiles/test_empty.mlt.pdf
 
 test:
-	./caml-tex.py test.mlt
-	pdflatex -shell-escape test.mlt.tex
-	pdflatex -shell-escape test.mlt.tex
-	open test.mlt.pdf
+	./caml-tex testfiles/test.mlt -o testfiles/test.mlt.tex
+	pdflatex -shell-escape -output-directory=testfiles testfiles/test.mlt.tex 
+	pdflatex -shell-escape -output-directory=testfiles testfiles/test.mlt.tex 
+	open testfiles/test.mlt.pdf
 
 bad:
-	./caml-tex.py test_bad.mlt
-	pdflatex -shell-escape test_bad.mlt.tex
-	pdflatex -shell-escape test_bad.mlt.tex
-	open test_bad.mlt.pdf
+	./caml-tex testfiles/test_bad.mlt -o testfiles/test_bad.mlt.tex
+	pdflatex -shell-escape -output-directory=testfiles testfiles/test_bad.mlt.tex 
+	pdflatex -shell-escape -output-directory=testfiles testfiles/test_bad.mlt.tex 
+	open testfiles/test_bad.mlt.pdf
