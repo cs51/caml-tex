@@ -126,7 +126,7 @@ def convert_to_tex(filename, outfilename):
             echo_in = bool(re.match(ECHO_IN, endline))
             echo_out = bool(re.match(ECHO_OUT, endline))
 
-            evals = [ ocaml.evaluate(statement) for statement in statements]
+            evals = [ocaml.evaluate(statement) for statement in statements]
 
             if echo_in and echo_out:
                 writer.write_ocaml("".join(evals))
