@@ -69,13 +69,12 @@ def extract_ml_statements(filepointer):
 
     while True:
         line = filepointer.readline()
-        print repr(line)
 
         if line is None:
             raise BadTexException("Opened Caml Statement never closed.")
 
         elif re.match(END_REGEX, line):
-            print "FOUND END", line
+            statements.append(statement)
             return statements, line
 
         statement += line
@@ -130,15 +129,13 @@ def convert_to_tex(filename, outfilename):
             evals = [ ocaml.evaluate(statement) for statement in statements]
 
             if echo_in and echo_out:
-                print "ECHO OUT:", evals, line
-
                 writer.write_ocaml("".join(evals))
             elif echo_in and not echo_out:
                 writer.write_ocaml("".join(statements))
 
         # case for ocaml listings, which do not interact with the shell
         elif re.match(LISTING, line):
-            statements, endline = extract_ml_statements(infile)
+            statements, _ = extract_ml_statements(infile)
             tex_statement = "".join(statements)
             writer.write_ocaml(tex_statement)
 
@@ -154,11 +151,8 @@ def run():
     Drive the whole program.
     """
     options, args = read_options()
-    print args
 
     for arg in args:
-        print arg
-
         if options.outfile is "":
             out = arg + '.tex'
         else:
