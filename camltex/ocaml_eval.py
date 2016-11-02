@@ -23,7 +23,7 @@ class OCamlSession(object):
         in the toplevel.
         """
         self.ocaml.sendline(ml_block)
-        self.ocaml.expect('#')
+        self.ocaml.expect('#\s+')
         statement = self.ocaml.before
 
         return statement.strip()
