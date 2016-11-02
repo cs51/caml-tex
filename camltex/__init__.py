@@ -28,7 +28,7 @@ def read_options():
 # Regular Expressions
 DOC_START = r"\s*\\begin{document}\s*"
 START_REGEX = r"\s*\\begin{caml_(example|example\*|eval)\s*}"
-END_REGEX = r"\\end{caml_(example|example\*|eval|listing)}\s*"
+END_REGEX = r"\s*\\end{caml_(example|example\*|eval|listing)}\s*"
 LISTING = r'\s*\\(begin|end){caml_listing}\s*'
 ECHO_IN = r'\s*\\end{caml_example\*?}\s*'
 ECHO_OUT = r'\s*\\end{caml_example}\s*'
@@ -138,8 +138,7 @@ def convert_to_tex(filename, outfilename):
 
         # case for ocaml listings, which do not interact with the shell
         elif re.match(LISTING, line):
-
-            statements, _ = extract_ml_statements(infile)
+            statements, endline = extract_ml_statements(infile)
             tex_statement = "".join(statements)
             writer.write_ocaml(tex_statement)
 

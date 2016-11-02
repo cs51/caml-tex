@@ -19,13 +19,13 @@ class OCamlSession(object):
 
     def evaluate(self, ml_block):
         """
-        Given an ML block, return the result of evaluating the ML block
+        Given an ML block, return the result 
+        of evaluating the ML block
         in the toplevel.
         """
         self.ocaml.sendline(ml_block)
         self.ocaml.expect('#\s+')
         statement = self.ocaml.before
-
         return statement.strip()
 
     def reset(self):
