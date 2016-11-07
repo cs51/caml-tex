@@ -74,7 +74,8 @@ def extract_ml_statements(filepointer):
             raise BadTexException("Opened Caml Statement never closed.")
 
         elif re.match(END_REGEX, line):
-            statements.append(statement)
+            if len(statement) > 0:
+                statements.append(statement)
             return statements, line
 
         statement += line
@@ -111,7 +112,6 @@ def convert_to_tex(filename, outfilename):
     while True:
 
         line = infile.readline()
-
         # if we've hit end of line, get out of here
         if not line:
             infile.close()
@@ -119,8 +119,7 @@ def convert_to_tex(filename, outfilename):
             return
 
         # case for ocaml statements that interact with the shell
-        if re.match(START_REGEX, line):
-
+        if re.match(START_REGEX, line):            
             statements, endline = extract_ml_statements(infile)
 
             echo_in = bool(re.match(ECHO_IN, endline))
@@ -129,7 +128,7 @@ def convert_to_tex(filename, outfilename):
             evals = [ocaml.evaluate(statement) for statement in statements]
 
             if echo_in and echo_out:
-                writer.write_ocaml("".join(evals))
+                writer.write_ocaml("\n".join(evals))
             elif echo_in and not echo_out:
                 writer.write_ocaml("".join(statements))
 

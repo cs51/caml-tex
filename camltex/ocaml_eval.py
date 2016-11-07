@@ -23,10 +23,23 @@ class OCamlSession(object):
         of evaluating the ML block
         in the toplevel.
         """
+        if '#' in ml_block:
+            count = len([c for c in ml_block if c == '#'])
+        else:
+            count = 0
+
         self.ocaml.sendline(ml_block)
-        self.ocaml.expect('#\s+')
-        statement = self.ocaml.before
-        return statement.strip()
+
+        statement = ""
+        for _ in range(count + 1):
+            self.ocaml.expect('#')
+            statement += self.ocaml.before
+
+        statement = statement.strip()
+        statement = statement.replace('\r\n', '\n')
+        statement = statement.replace('\n\n', '\n')
+
+        return statement.strip() + '\n'
 
     def reset(self):
         """
