@@ -7,14 +7,15 @@ from pygments import highlight
 from pygments.formatters import LatexFormatter
 from pygments.lexers.functional import OcamlLexer
 
-LF = LatexFormatter()
 OL = OcamlLexer()
 
 class CamlTexFileWriter(object):
     """
     Wrapper class to manage listings in OCaml.
     """
-    def __init__(self, filepath):
+    def __init__(self, filepath, style = 'default'):
+        self.formatter = LatexFormatter(style=style)
+
         self.fname = filepath
         self.fpointer = open(filepath, 'w')
 
@@ -25,7 +26,7 @@ class CamlTexFileWriter(object):
         code formatting styles.
         """
         self.fpointer.write('\n\\usepackage{fancyvrb,color}\n')
-        self.fpointer.write(LF.get_style_defs())
+        self.fpointer.write(self.formatter.get_style_defs())
 
     def write_tex(self, line):
         """
@@ -39,7 +40,7 @@ class CamlTexFileWriter(object):
         Write stylized OCaml to the output file,
         styling with pygments at the same time.
         """
-        self.fpointer.write(highlight(ml_block, OL, LF))
+        self.fpointer.write(highlight(ml_block, OL, self.formatter))
         return True
 
     def close(self):

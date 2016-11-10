@@ -23,6 +23,10 @@ def read_options():
                       default="",
                       help='set the output .tex file')
 
+    parser.add_option('-s', '--style', dest='style',
+                        default='default',
+                        help='set the pygments formatting style')
+
     return parser.parse_args()
 
 # Regular Expressions
@@ -84,7 +88,7 @@ def extract_ml_statements(filepointer):
             statements.append(statement)
             statement = ""
 
-def convert_to_tex(filename, outfilename):
+def convert_to_tex(filename, outfilename, style='default'):
     """ Convert the MLT file at the path filename
         to a .tex file.
     """
@@ -94,7 +98,7 @@ def convert_to_tex(filename, outfilename):
 
     # try to open the outfile as a relative path first
     try:
-        writer = CamlTexFileWriter(os.getcwd() + '/' + outfilename)
+        writer = CamlTexFileWriter(os.getcwd() + '/' + outfilename, style=style)
     except IOError:
         try:
             writer = CamlTexFileWriter(outfilename)
@@ -157,4 +161,4 @@ def run():
         else:
             out = options.outfile
 
-        convert_to_tex(arg, out)
+        convert_to_tex(arg, out, style=options.style)
