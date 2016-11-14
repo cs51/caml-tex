@@ -27,6 +27,15 @@ def read_options():
                         default='default',
                         help='set the pygments formatting style')
 
+    parser.add_option('-p', '--prompt', action='store_true',
+                        dest='prompt',
+                        help=("set the prompt shown before each command. "
+                            "If not set, no prompt is shown."))
+    parser.add_option('-v', '--prompt-value', dest='promptvalue',
+                        default='$',
+                        help=("If -p is set, set the prompt value. "
+                               "If -p is set and this value is not, the default "
+                               "is used."))
     return parser.parse_args()
 
 # Regular Expressions
@@ -88,7 +97,7 @@ def extract_ml_statements(filepointer):
             statements.append(statement)
             statement = ""
 
-def convert_to_tex(filename, outfilename, style='default'):
+def convert_to_tex(filename, outfilename, style='default', prompt=None):
     """ Convert the MLT file at the path filename
         to a .tex file.
     """
@@ -98,7 +107,12 @@ def convert_to_tex(filename, outfilename, style='default'):
 
     # try to open the outfile as a relative path first
     try:
-        writer = CamlTexFileWriter(os.getcwd() + '/' + outfilename, style=style)
+        if not prompt:
+            writer = CamlTexFileWriter(os.getcwd() + '/' + outfilename, style=style)
+        else:
+            writer = CamlTexFileWriter(os.getcwd() + '/' + outfilename,
+                                        prompt=prompt,
+                                        style=style)
     except IOError:
         try:
             writer = CamlTexFileWriter(outfilename)
@@ -132,9 +146,9 @@ def convert_to_tex(filename, outfilename, style='default'):
             evals = [ocaml.evaluate(statement) for statement in statements]
 
             if echo_in and echo_out:
-                writer.write_ocaml("\n".join(evals))
+                writer.write_ocaml_with_evals(evals)
             elif echo_in and not echo_out:
-                writer.write_ocaml("".join(statements))
+                writer.write_ocaml_statements(statements)
 
         # case for ocaml listings, which do not interact with the shell
         elif re.match(LISTING, line):
@@ -154,6 +168,7 @@ def run():
     Drive the whole program.
     """
     options, args = read_options()
+    print options
 
     for arg in args:
         if options.outfile is "":
@@ -161,4 +176,11 @@ def run():
         else:
             out = options.outfile
 
-        convert_to_tex(arg, out, style=options.style)
+        if not options.prompt and not options.style:
+            convert_to_tex(arg, out)
+        elif not options.prompt and options.style:
+            convert_to_tex(arg, out, style=options.style)
+        elif options.prompt and not options.style:
+            convert_to_tex(arg, out, prompt=options.promptvalue)
+        else:
+            convert_to_tex(arg, out, style=options.style, prompt=options.promptvalue)

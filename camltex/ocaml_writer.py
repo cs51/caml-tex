@@ -13,8 +13,9 @@ class CamlTexFileWriter(object):
     """
     Wrapper class to manage listings in OCaml.
     """
-    def __init__(self, filepath, style = 'default'):
+    def __init__(self, filepath, style = 'default', prompt=None):
         self.formatter = LatexFormatter(style=style)
+        self.prompt = prompt
 
         self.fname = filepath
         self.fpointer = open(filepath, 'w')
@@ -36,11 +37,34 @@ class CamlTexFileWriter(object):
         return True
 
     def write_ocaml(self, ml_block):
+        self.fpointer.write(highlight(ml_block, OL, self.formatter))
+
+    def write_ocaml_with_evals(self, ml_statements):
+        
+        def clean(s):
+            splitted = s.split(';;\n')
+            stmnt = splitted[0] + ';;'
+            evaled = splitted[1].strip()
+
+            return stmnt + '\n' + evaled
+
+        statements = [clean(mls) for mls in ml_statements]
+
+        if self.prompt:
+            statements = ["{} {}".format(self.prompt, s) for s in statements]
+    
+        self.write_ocaml("\n".join(statements))
+
+    def write_ocaml_statements(self, statements):
         """
         Write stylized OCaml to the output file,
         styling with pygments at the same time.
         """
-        self.fpointer.write(highlight(ml_block, OL, self.formatter))
+        if self.prompt:
+            statements = ["{} {}".format(self.prompt, s) for s in statements]
+        
+        self.write_ocaml("\n".join(statements))
+
         return True
 
     def close(self):

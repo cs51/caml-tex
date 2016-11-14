@@ -39,7 +39,7 @@ class OCamlSession(object):
         statement = statement.replace('\r\n', '\n')
         statement = statement.replace('\n\n', '\n')
 
-        return statement.strip() + '\n'
+        return statement.strip()
 
     def reset(self):
         """
