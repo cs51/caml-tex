@@ -42,11 +42,15 @@ class CamlTexFileWriter(object):
     def write_ocaml_with_evals(self, ml_statements):
         
         def clean(s):
-            splitted = s.split(';;\n')
-            stmnt = splitted[0] + ';;'
-            evaled = splitted[1].strip()
 
-            return stmnt + '\n' + evaled
+            splitted = s.split(';;\n')
+            
+            if len(splitted) > 1:
+                stmnt = splitted[0] + ';;'
+                evaled = splitted[1].strip()
+                return stmnt + '\n' + evaled
+            else:
+                return s
 
         statements = [clean(mls) for mls in ml_statements]
 
