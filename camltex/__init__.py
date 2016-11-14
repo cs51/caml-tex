@@ -168,7 +168,6 @@ def run():
     Drive the whole program.
     """
     options, args = read_options()
-    print options
 
     for arg in args:
         if options.outfile is "":
