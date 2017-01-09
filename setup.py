@@ -9,8 +9,8 @@ setup(name='camltex',
         license='MIT',
         packages=find_packages(),
         install_requires=[
-            'pygments',
-            'pexpect',
+            'pygments>=2.1.3',
+            'pexpect>=4.2.1',
             ],
         entry_points={
             'console_scripts': [

@@ -4,6 +4,12 @@
 **.aux
 **.log
 **.pdf
+**.sty
+**.idx
+**.out
+makefile
+
+_minted-*
 
 # Setuptools distribution folder
 /dist/
