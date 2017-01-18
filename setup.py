@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(name='camltex',
-        version='0.0.9',
+        version='0.1.1',
         description='CLI for processing embedded OCaml.',
         url='http://github.com/cs51/camltex',
         author='Sam Green',

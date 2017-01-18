@@ -36,6 +36,10 @@ def read_options():
                         help=("If -p is set, set the prompt value. "
                                "If -p is set and this value is not, the default "
                                "is used."))
+    parser.add_option('-n', '--no-headers', default=False, action='store_true',
+                            dest='no_headers',
+                            help="If -h is set, the styling headers are not added to the file.\
+                             For pre-processing ml files that will be embedded in other mlt files.")
     return parser.parse_args()
 
 # Regular Expressions
@@ -97,7 +101,7 @@ def extract_ml_statements(filepointer):
             statements.append(statement)
             statement = ""
 
-def convert_to_tex(filename, outfilename, style='default', prompt=None):
+def convert_to_tex(filename, outfilename, style='default', prompt=None, no_headers=False):
     """ Convert the MLT file at the path filename
         to a .tex file.
     """
@@ -108,7 +112,7 @@ def convert_to_tex(filename, outfilename, style='default', prompt=None):
     # try to open the outfile as a relative path first
     try:
         if not prompt:
-            writer = CamlTexFileWriter(os.getcwd() + '/' + outfilename, style=style)
+            writer = CamlTexFileWriter(os.getcwd() + '/' + outfilename, no_style=style)
         else:
             writer = CamlTexFileWriter(os.getcwd() + '/' + outfilename,
                                         prompt=prompt,
@@ -158,7 +162,7 @@ def convert_to_tex(filename, outfilename, style='default', prompt=None):
 
         # otherwise, this line is just .tex and should be echoed
         else:
-            if re.search(DOC_START, line):
+            if re.search(DOC_START, line) and not no_headers:
                 writer.write_styles()
 
             writer.write_tex(line)
@@ -168,7 +172,6 @@ def run():
     Drive the whole program.
     """
     options, args = read_options()
-
     for arg in args:
         if options.outfile is "":
             out = arg + '.tex'
@@ -178,8 +181,8 @@ def run():
         if not options.prompt and not options.style:
             convert_to_tex(arg, out)
         elif not options.prompt and options.style:
-            convert_to_tex(arg, out, style=options.style)
+            convert_to_tex(arg, out, style=options.style, no_headers=options.no_headers)
         elif options.prompt and not options.style:
-            convert_to_tex(arg, out, prompt=options.promptvalue)
+            convert_to_tex(arg, out, prompt=options.promptvalue, no_headers=options.no_headers)
         else:
-            convert_to_tex(arg, out, style=options.style, prompt=options.promptvalue)
+            convert_to_tex(arg, out, style=options.style, prompt=options.promptvalue, no_headers=options.no_headers)
