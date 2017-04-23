@@ -5,6 +5,11 @@ OCamlSession, built on pexpect.
 
 
 import pexpect
+import re
+import sys
+
+ANSI_RE = re.compile(r'\x1b[^m]*m')
+ANSI_RE2 = re.compile(r'\x1b\[A')
 
 class OCamlSession(object):
     """
@@ -28,12 +33,12 @@ class OCamlSession(object):
         else:
             count = 0
 
+        # self.ocaml.sendline(unicode(ml_block))
         self.ocaml.sendline(ml_block)
 
         statement = ""
-        for _ in range(count + 1):
-            self.ocaml.expect('#')
-            statement += self.ocaml.before
+        self.ocaml.expect(r'#\s')
+        statement +=  ANSI_RE2.sub('', ANSI_RE.sub('', self.ocaml.before))
 
         statement = statement.strip()
         statement = statement.replace('\r\n', '\n')
@@ -46,7 +51,9 @@ class OCamlSession(object):
         Return the session to an clean state by
         resetting the underlying OCaml process.
         """
-        self.ocaml = pexpect.spawn('ocaml')
+        self.ocaml = pexpect.spawn('ocaml', encoding='ascii')
+        # self.ocaml = pexpect.spawnu('ocaml -stdin') # , encoding='ascii')
+
         self.ocaml.expect('#')
 
         return True

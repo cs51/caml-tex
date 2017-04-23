@@ -38,6 +38,7 @@ class CamlTexFileWriter(object):
 
     def write_ocaml(self, ml_block):
         self.fpointer.write(highlight(ml_block, OL, self.formatter))
+        self.fpointer.flush()
 
     def write_ocaml_with_evals(self, ml_statements):
         
@@ -53,11 +54,8 @@ class CamlTexFileWriter(object):
                 return s
 
         statements = [clean(mls) for mls in ml_statements]
+        self.write_ocaml_statements(statements)
 
-        if self.prompt:
-            statements = ["{} {}".format(self.prompt, s) for s in statements]
-    
-        self.write_ocaml("\n".join(statements))
 
     def write_ocaml_statements(self, statements):
         """

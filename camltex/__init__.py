@@ -99,6 +99,7 @@ def extract_ml_statements(filepointer):
 
         if ";;" in line:
             statements.append(statement)
+
             statement = ""
 
 def convert_to_tex(filename, outfilename, style='default', prompt=None, no_headers=False):
@@ -106,13 +107,15 @@ def convert_to_tex(filename, outfilename, style='default', prompt=None, no_heade
         to a .tex file.
     """
 
+    print "Starting OCaml..."
     # start up and wait for the shell to be ready
     ocaml = OCamlSession()
 
+    print "Opening the output file..."
     # try to open the outfile as a relative path first
     try:
         if not prompt:
-            writer = CamlTexFileWriter(os.getcwd() + '/' + outfilename, no_style=style)
+            writer = CamlTexFileWriter(os.getcwd() + '/' + outfilename, style=style)
         else:
             writer = CamlTexFileWriter(os.getcwd() + '/' + outfilename,
                                         prompt=prompt,
@@ -125,15 +128,18 @@ def convert_to_tex(filename, outfilename, style='default', prompt=None, no_heade
             exit(1)
 
     # get the source file and the output file
+    print "Opening the source file..."
     try:
         infile = open(filename, 'r')
     except IOError as excep:
         print "Input file error: {}".format(excep)
         exit(1)
 
+    print "Reading the source file..."
     while True:
 
         line = infile.readline()
+
         # if we've hit end of line, get out of here
         if not line:
             infile.close()
@@ -142,17 +148,18 @@ def convert_to_tex(filename, outfilename, style='default', prompt=None, no_heade
 
         # case for ocaml statements that interact with the shell
         if re.match(START_REGEX, line):            
-            statements, endline = extract_ml_statements(infile)
+            ss, endline = extract_ml_statements(infile)
 
             echo_in = bool(re.match(ECHO_IN, endline))
             echo_out = bool(re.match(ECHO_OUT, endline))
 
-            evals = [ocaml.evaluate(statement) for statement in statements]
+            evals = [ocaml.evaluate(statement) for statement in ss]
+
 
             if echo_in and echo_out:
                 writer.write_ocaml_with_evals(evals)
             elif echo_in and not echo_out:
-                writer.write_ocaml_statements(statements)
+                writer.write_ocaml_statements(ss)
 
         # case for ocaml listings, which do not interact with the shell
         elif re.match(LISTING, line):
